@@ -187,13 +187,12 @@ if __name__ == "__main__":
 
     variant = dict(
         env_kwargs=dict(
-            reward_mode=1,  ## 0 for dense, 1 for sparse
+            reward_mode=0,  ## 0 for dense, 1 for sparse
             maxActionSteps=10,
             obj_name_list=['b_L1'],
             isRandomGoals=False,
             isIgnoreGoalCollision=False,
-            fixed_objects_goals=(-0, -0.3,
-                                 ),  # shape (3*n,)
+            fixed_objects_goals=(-0, -0.3,  ),  # shape (3*n,)
 
             vis_debug=False
         ),
@@ -201,7 +200,6 @@ if __name__ == "__main__":
             init_prob=1,
             decay_rate=0.97,
         ),
-
 
         observation_key = observation_key,
         desired_goal_key = desired_goal_key,
@@ -219,24 +217,24 @@ if __name__ == "__main__":
             goal_keys=None,
         ),
         algorithm_kwargs=dict(
-            num_epochs=2,
-            num_eval_steps_per_epoch=10 , # 100
+            num_epochs= 100,
+            num_eval_steps_per_epoch= 100 , # 100
             num_train_loops_per_epoch = 1, #1
-            num_trains_per_train_loop=5,#1000
-            num_expl_steps_per_train_loop=5,#500
-            min_num_steps_before_training=0,
-            max_path_length=10,
-            batch_size=1,#2
+            num_trains_per_train_loop= 1000,#1000
+            num_expl_steps_per_train_loop= 500,#500
+            min_num_steps_before_training= 0,
+            max_path_length= 10,
+            batch_size= 2,#2
         ),
         trainer_kwargs=dict(
             discount=0.99,
             learning_rate=3E-4,
             target_update_period=2,
             soft_target_tau=1,
-
         ),
         bucket_path = 'jerry-castle/castle_q_learning/results'  #None
     )
+
     #setup_logger('name-of-experiment', variant=variant)
     # ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
     #experiment(variant)
