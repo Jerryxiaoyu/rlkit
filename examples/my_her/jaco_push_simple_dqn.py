@@ -1,7 +1,10 @@
 """
 Run DQN on grid world.
 """
-
+import os, inspect
+project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))))
+print(project_dir)
+os.sys.path.insert(0, project_dir)
 
 
 from rlkit.exploration_strategies.base import \
