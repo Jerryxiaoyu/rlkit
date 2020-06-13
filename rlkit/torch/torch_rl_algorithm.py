@@ -33,10 +33,11 @@ class TorchBatchRLAlgorithm(BatchRLAlgorithm):
 class TorchTrainer(Trainer, metaclass=abc.ABCMeta):
     def __init__(self):
         self._num_train_steps = 0
+        self.ignore_keys = []
 
     def train(self, np_batch):
         self._num_train_steps += 1
-        batch = np_to_pytorch_batch(np_batch)
+        batch = np_to_pytorch_batch(np_batch, ignore_keys=self.ignore_keys)
         self.train_from_torch(batch)
 
     def get_diagnostics(self):

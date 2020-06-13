@@ -75,11 +75,14 @@ if __name__ == "__main__":
             ),
             observation_key='latent_observation',
             desired_goal_key='latent_desired_goal',
-            presampled_goals_path=osp.join(
-                osp.dirname(mwmj.__file__),
-                "goals",
-                "door_goals.npy",
-            ),
+            generate_goal_dataset_fctn=get_image_presampled_goals_from_vae_env,
+            presampled_goals_path=None,
+            #
+            # osp.join(
+            #     osp.dirname(mwmj.__file__),
+            #     "goals",
+            #     "door_goals.npy",
+            # ),
             presample_goals=True,
             vae_wrapped_env_kwargs=dict(
                 sample_from_true_prior=True,

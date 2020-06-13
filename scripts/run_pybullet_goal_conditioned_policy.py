@@ -2,15 +2,23 @@ import argparse
 import torch
 
 from rlkit.core import logger
-from rlkit.samplers.rollout_functions import multitask_rollout
+from rlkit.samplers.rollout_functions import multitask_rollout,multitask_dict_rollout
 from rlkit.torch import pytorch_util as ptu
 from rlkit.envs.vae_wrapper import VAEWrappedEnv
+import gym
+import multiworld
+
 
 
 def simulate_policy(args):
+
+
     data = torch.load(args.file)
     policy = data['evaluation/policy']
     env = data['evaluation/env']
+
+#    env = gym.make(env.spec.id, isRender=True, isRenderGoal= True,)
+
     print("Policy and environment loaded")
     if args.gpu:
         ptu.set_gpu_mode(True)
@@ -22,13 +30,13 @@ def simulate_policy(args):
         env.enable_render()
     paths = []
     while True:
-        paths.append(multitask_rollout(
+        paths.append(multitask_dict_rollout(
             env,
             policy,
             max_path_length=args.H,
             render=not args.hide,
-            observation_key='observation',
-            desired_goal_key='desired_goal',
+            observation_key='heatmap',
+            desired_goal_key='heatmap',
         ))
         if hasattr(env, "log_diagnostics"):
             env.log_diagnostics(paths)
@@ -43,8 +51,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--file', type=str,
                         help='path to the snapshot file',
-                        default='/home/drl/PycharmProjects/JerryRepos/rlkit/data/her-dqn-jaco-push-primi-disc-experiment/her-dqn-jaco_push_primi_disc-experiment_2020_05_15_15_36_08_0000--s-0/params.pkl')
-    parser.add_argument('--H', type=int, default=300,
+                        default='/home/drl/PycharmProjects/JerryRepos/rlkit/data/06-09-jaco-push-dqn/06-09-jaco_push_dqn_2020_06_09_14_22_36_0000--s-46168/params.pkl')
+    parser.add_argument('--H', type=int, default=30,
                         help='Max length of rollout')
     parser.add_argument('--speedup', type=float, default=10,
                         help='Speedup')
@@ -55,4 +63,5 @@ if __name__ == "__main__":
     parser.add_argument('--hide', action='store_true')
     args = parser.parse_args()
 
+    multiworld.register_pybullet_envs()
     simulate_policy(args)

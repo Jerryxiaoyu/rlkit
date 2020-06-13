@@ -17,6 +17,8 @@ from rlkit.launchers import conf
 from rlkit.torch.pytorch_util import set_gpu_mode
 import rlkit.pythonplusplus as ppp
 
+
+
 GitInfo = namedtuple(
     'GitInfo',
     [
@@ -253,6 +255,11 @@ def setup_logger(
     if first_time:
         log_dir = create_log_dir(exp_prefix, **create_log_dir_kwargs)
 
+    logger_variant = variant.get("logger_variant", dict())
+    if logger_variant.get("tensorboard", False):
+        tensorboard_log_path = osp.join(log_dir, "tensorboard")
+        logger.add_tensorboard_output(tensorboard_log_path)
+
     if variant is not None:
         logger.log("Variant:")
         logger.log(json.dumps(dict_to_safe_json(variant), indent=2))
@@ -399,7 +406,7 @@ try:
         mount.MountLocal(local_dir=REPO_DIR, pythonpath=True),
     ]
     for code_dir in conf.CODE_DIRS_TO_MOUNT:
-        CODE_MOUNTS.append(mount.MountLocal(local_dir=code_dir, pythonpath=True))
+        CODE_MOUNTS.append(mount.MountLocal(local_dir=code_dir, pythonpath=True, filter_dir=('data','log-files', 'notebook')))
 
     NON_CODE_MOUNTS = []
     for non_code_mapping in conf.DIR_AND_MOUNT_POINT_MAPPINGS:
@@ -641,9 +648,11 @@ def run_experiment(
                 ),
             )
     else:
-        image_id = None
+        image_id = conf.AWS_CPU_IMAGE_ID
+
     if hasattr(conf, "AWS_S3_PATH"):
         aws_s3_path = conf.AWS_S3_PATH
+        s3_bucket = conf.AWS_S3_BUCKET
     else:
         aws_s3_path = None
 
@@ -704,9 +713,11 @@ def run_experiment(
     elif mode == 'ec2':
         # Do this separately in case someone does not have EC2 configured
         dmode = doodad.mode.EC2AutoconfigDocker(
+            s3_bucket=s3_bucket,
             image=docker_image,
             image_id=image_id,
             region=region,
+            s3_bucket_region = conf.S3_REGION,
             instance_type=instance_type,
             spot_price=spot_price,
             s3_log_prefix=exp_prefix,
@@ -717,6 +728,9 @@ def run_experiment(
             gpu=use_gpu,
             aws_s3_path=aws_s3_path,
             num_exps=num_exps_per_instance,
+
+            mount_str=conf.MOUNT_STR,
+            aws_cmd_str=conf.aws_cmd_str,
             **mode_kwargs
         )
     elif mode == 'gcp':
@@ -806,11 +820,15 @@ def run_experiment(
             'output_dir': snapshot_dir_for_script,
             'run_experiment_kwargs': run_experiment_kwargs,
             'mode': mode,
+
         },
         use_cloudpickle=True,
         target_mount=target_mount,
         verbose=verbose,
         launch_locally=launch_locally,
+
+
+
     )
 
 

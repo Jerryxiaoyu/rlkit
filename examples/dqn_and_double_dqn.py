@@ -16,7 +16,7 @@ from rlkit.data_management.env_replay_buffer import EnvReplayBuffer
 from rlkit.launchers.launcher_util import setup_logger
 from rlkit.samplers.data_collector import MdpPathCollector
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
-
+from rlkit.launchers.launcher_util import run_experiment
 
 def experiment(variant):
     expl_env = gym.make('CartPole-v0')
@@ -81,19 +81,34 @@ if __name__ == "__main__":
         layer_size=256,
         replay_buffer_size=int(1E6),
         algorithm_kwargs=dict(
-            num_epochs=3000,
-            num_eval_steps_per_epoch=5000,
-            num_trains_per_train_loop=1000,
-            num_expl_steps_per_train_loop=1000,
-            min_num_steps_before_training=1000,
-            max_path_length=1000,
-            batch_size=256,
+            num_epochs=3,
+            num_eval_steps_per_epoch=1,
+            num_trains_per_train_loop=1,
+            num_expl_steps_per_train_loop=1,
+            min_num_steps_before_training=1,
+            max_path_length=10,
+            batch_size=1,
         ),
         trainer_kwargs=dict(
             discount=0.99,
             learning_rate=3E-4,
         ),
     )
-    setup_logger('name-of-experiment', variant=variant)
+   # setup_logger('name-of-experiment', variant=variant)
     # ptu.set_gpu_mode(True)  # optionally set the GPU (default=False)
-    experiment(variant)
+#experiment(variant)
+    mode = 'here_no_doodad'#'here_no_doodad'
+    exp_prefix = 'carpole_dqn'
+
+    ptu.set_gpu_mode(True)
+
+
+    run_experiment(
+        experiment,
+        exp_prefix=exp_prefix,
+        mode=mode,
+        variant=variant,
+        region='us-east-2',
+        use_gpu=True,
+        verbose=True,
+  )

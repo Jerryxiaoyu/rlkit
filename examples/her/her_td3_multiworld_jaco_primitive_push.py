@@ -22,12 +22,12 @@ from rlkit.torch.networks import FlattenMlp, TanhMlpPolicy
 from rlkit.torch.td3.td3 import TD3Trainer
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
-ptu.set_gpu_mode(True)
+
 def experiment(variant):
     import multiworld
     multiworld.register_all_envs()
-    eval_env = gym.make('SawyerReachXYZEnv-v0')
-    expl_env = gym.make('SawyerReachXYZEnv-v0')
+    eval_env = gym.make('Jaco2PushPrimitiveOneXYEnv-v0')
+    expl_env = gym.make('Jaco2PushPrimitiveOneXYEnv-v0')
     observation_key = 'state_observation'
     desired_goal_key = 'state_desired_goal'
     achieved_goal_key = desired_goal_key.replace("desired", "achieved")
@@ -37,8 +37,8 @@ def experiment(variant):
         min_sigma=.2,  # constant sigma
         epsilon=.3,
     )
-    obs_dim = expl_env.observation_space.spaces['observation'].low.size
-    goal_dim = expl_env.observation_space.spaces['desired_goal'].low.size
+    obs_dim = expl_env.observation_space.spaces['state_observation'].shape[0]
+    goal_dim = expl_env.observation_space.spaces['desired_goal'].shape[0]
     action_dim = expl_env.action_space.low.size
     qf1 = FlattenMlp(
         input_size=obs_dim + goal_dim + action_dim,
@@ -49,7 +49,7 @@ def experiment(variant):
         input_size=obs_dim + goal_dim + action_dim,
         output_size=1,
         **variant['qf_kwargs']
-    )
+      )
     target_qf1 = FlattenMlp(
         input_size=obs_dim + goal_dim + action_dim,
         output_size=1,
@@ -115,13 +115,13 @@ def experiment(variant):
     algorithm.to(ptu.device)
     algorithm.train()
 
-
+from rlkit.launchers.launcher_util import run_experiment
 if __name__ == "__main__":
     variant = dict(
         algo_kwargs=dict(
             num_epochs=100,
-            max_path_length=50,
-            batch_size=128,
+            max_path_length=30,
+            batch_size=512,
             num_eval_steps_per_epoch=1000,
             num_expl_steps_per_train_loop=1000,
             num_trains_per_train_loop=1000,
@@ -141,5 +141,23 @@ if __name__ == "__main__":
             hidden_sizes=[400, 300],
         ),
     )
-    setup_logger('her-td3-sawyer-experiment', variant=variant)
-    experiment(variant)
+    setup_logger('her-td3-primitive-jaco-experiment', variant=variant)
+    mode = 'local'
+    exp_prefix = 'dev-{}'.format(
+        __file__.replace('/', '-').replace('_', '-').split('.')[0]
+    )
+
+    run_experiment(
+        experiment,
+        exp_prefix=exp_prefix,
+        mode=mode,
+        variant=variant,
+        use_gpu=True,
+        snapshot_gap=200,
+        snapshot_mode='gap_and_last',
+        num_exps_per_instance=3,
+        gcp_kwargs=dict(
+            zone='us-west1-b',
+        ),
+
+    )

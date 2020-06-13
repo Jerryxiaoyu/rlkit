@@ -22,6 +22,7 @@ class DQNTrainer(TorchTrainer):
 
             discount=0.99,
             reward_scale=1.0,
+            ignore_keys =[],
     ):
         super().__init__()
         self.qf = qf
@@ -39,6 +40,8 @@ class DQNTrainer(TorchTrainer):
         self.eval_statistics = OrderedDict()
         self._n_train_steps_total = 0
         self._need_to_update_eval_statistics = True
+
+        self.ignore_keys = ignore_keys
 
     def train_from_torch(self, batch):
         rewards = batch['rewards'] * self.reward_scale

@@ -65,13 +65,15 @@ class BaseRLAlgorithm(object, metaclass=abc.ABCMeta):
         for post_epoch_func in self.post_epoch_funcs:
             post_epoch_func(self, epoch)
 
+        #logger.upload_aws()
+
     def _get_snapshot(self):
         snapshot = {}
         for k, v in self.trainer.get_snapshot().items():
             snapshot['trainer/' + k] = v
         for k, v in self.expl_data_collector.get_snapshot().items():
             snapshot['exploration/' + k] = v
-        for k, v in self.eval_data_collector.get_snapshot().items():
+        for k, v in self.eval_data_collector.get_snapshot(is_eval=True).items():
             snapshot['evaluation/' + k] = v
         for k, v in self.replay_buffer.get_snapshot().items():
             snapshot['replay_buffer/' + k] = v

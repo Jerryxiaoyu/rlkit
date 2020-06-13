@@ -2,9 +2,9 @@ import numpy as np
 from gym.spaces import Dict, Discrete
 
 from rlkit.data_management.replay_buffer import ReplayBuffer
+import h5py
 
-
-class ObsDictRelabelingBuffer(ReplayBuffer):
+class fileRelabelingBuffer(ReplayBuffer):
     """
     Replay buffer for environments whose observations are dictionaries, such as
         - OpenAI Gym GoalEnv environments. https://blog.openai.com/ingredients-for-robotics-research/
@@ -24,6 +24,7 @@ class ObsDictRelabelingBuffer(ReplayBuffer):
             self,
             max_size,
             env,
+
             fraction_goals_rollout_goals=1.0,
             fraction_goals_env_goals=0.0,
             internal_keys=None,
@@ -32,6 +33,7 @@ class ObsDictRelabelingBuffer(ReplayBuffer):
             desired_goal_key='desired_goal',
             achieved_goal_key='achieved_goal',
     ):
+
         if internal_keys is None:
             internal_keys = []
         self.internal_keys = internal_keys
@@ -86,6 +88,26 @@ class ObsDictRelabelingBuffer(ReplayBuffer):
         # Let j be any index in self._idx_to_future_obs_idx[i]
         # Then self._next_obs[j] is a valid next observation for observation i
         self._idx_to_future_obs_idx = [None] * max_size
+    def creat_file_buffer(self):
+        self.buffer_path = 'replay_buffer.hdf5'
+        self.buffer_file = h5py.File(self.buffer_path, 'w')
+        group = self.buffer_file.create_group('buffer')
+
+        save_keys = ['observations', 'actions', 'rewards', 'next_observations','terminals']
+        for key in save_keys:
+            if key in episode['transitions']:
+                test_data = episode['transitions'][key]
+            elif key in episode['transitions']['state']:
+                test_data = episode['transitions']['state'][key]
+            else:
+                raise NotImplementedError
+            n_batch = test_data.shape[0]
+            ndim = test_data.reshape((n_batch, -1)).shape[1]
+            data_dype = test_data.dtype
+            # print(key, ndim, data_dype)
+
+            group.create_dataset(key, (NUM_EPISODE, N_STEPS, ndim),
+                                 dtype=data_dype)
 
     def add_sample(self, observation, action, reward, terminal,
                    next_observation, **kwargs):
@@ -256,13 +278,13 @@ class ObsDictRelabelingBuffer(ReplayBuffer):
     def _batch_obs_dict(self, indices):
         return {
             key: self._obs[key][indices]
-            for key in self.ob_keys_to_save + self.internal_keys
+            for key in self.ob_keys_to_save
         }
 
     def _batch_next_obs_dict(self, indices):
         return {
             key: self._next_obs[key][indices]
-            for key in self.ob_keys_to_save + self.internal_keys
+            for key in self.ob_keys_to_save
         }
 
 

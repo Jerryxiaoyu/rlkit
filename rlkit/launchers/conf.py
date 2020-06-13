@@ -1,42 +1,16 @@
-"""
-Copy this file to config.py and modify as needed.
-"""
 import os
 from os.path import join
 import rlkit
 
-"""
-`doodad.mount.MountLocal` by default ignores directories called "data"
-If you're going to rename this directory and use EC2, then change
-`doodad.mount.MountLocal.filter_dir`
-"""
-# The directory of the project, not source
-rlkit_project_dir = join(os.path.dirname(rlkit.__file__), os.pardir)
-LOCAL_LOG_DIR = join(rlkit_project_dir, 'data')
-
-"""
-********************************************************************************
-********************************************************************************
-********************************************************************************
-
-You probably don't need to set all of the configurations below this line,
-unless you use AWS, GCP, Slurm, and/or Slurm on a remote server. I recommend
-ignoring most of these things and only using them on an as-needed basis.
-
-********************************************************************************
-********************************************************************************
-********************************************************************************
-"""
-
-"""
-General doodad settings.
-"""
+project_dir = join(os.path.dirname(rlkit.__file__), os.pardir)
+LOCAL_LOG_DIR = join(project_dir, 'log-files')
+# Change these things
 CODE_DIRS_TO_MOUNT = [
-    rlkit_project_dir,
-    # '/home/user/python/module/one', Add more paths as needed
+    project_dir
 ]
 
 HOME = os.getenv('HOME') if os.getenv('HOME') is not None else os.getenv("USERPROFILE")
+
 
 DIR_AND_MOUNT_POINT_MAPPINGS = [
     dict(
@@ -44,109 +18,95 @@ DIR_AND_MOUNT_POINT_MAPPINGS = [
         mount_point='/root/.mujoco',
     ),
 ]
+
 RUN_DOODAD_EXPERIMENT_SCRIPT_PATH = (
-    join(rlkit_project_dir, 'scripts', 'run_experiment_from_doodad.py')
+   # join(project_dir, 'scripts', 'run_pre_command.py'),
+    join(project_dir, 'scripts', 'run_experiment_from_doodad.py')
     # '/home/user/path/to/rlkit/scripts/run_experiment_from_doodad.py'
 )
-"""
-AWS Settings
-"""
-# If not set, default will be chosen by doodad
-# AWS_S3_PATH = 's3://bucket/directory
 
-# The docker image is looked up on dockerhub.com.
-DOODAD_DOCKER_IMAGE = "TODO"
-INSTANCE_TYPE = 'c4.large'
-SPOT_PRICE = 0.03
+MOUNT_STR = ' -v /home/ubuntu/jerry/multiworld/multiworld:/home/drl/PycharmProjects/JerryRepos/rlkit/multiworld '  \
+              ' -v /home/ubuntu/dataset:/home/drl/dataset'
+aws_cmd_str=[
+  "cd /home/ubuntu/jerry/multiworld\n" ,
+  "git pull\n" ,
+]
 
-GPU_DOODAD_DOCKER_IMAGE = 'TODO'
-GPU_INSTANCE_TYPE = 'g2.2xlarge'
-GPU_SPOT_PRICE = 0.5
+S3_REGION = 'us-east-2'
+AWS_S3_BUCKET ='jerry-doodad'
+AWS_S3_PATH="s3://jerry-doodad/doodad/rlkit-logs"
 
-# You can use AMI images with the docker images already installed.
-REGION_TO_GPU_AWS_IMAGE_ID = {
-    'us-west-1': "TODO",
-    'us-east-1': "TODO",
-}
+# You probably don't need to change things below
+# Specifically, the docker image is looked up on dockerhub.com.
+DOODAD_DOCKER_IMAGE = 'jerryxiaoyu/rlkit:v1.1'                         #'anair17/railrl-gpu-v7a' #
 
-REGION_TO_GPU_AWS_AVAIL_ZONE = {
-    'us-east-1': "us-east-1b",
-}
+INSTANCE_TYPE = 'c4.large'#'c4.large't2.micro
+SPOT_PRICE = 0.1
+SPOT_PRICE_LOOKUP = {'c4.large': 0.1, 'm4.large': 0.1, 'm4.xlarge': 0.2, 'm4.2xlarge': 0.4}
 
-# This really shouldn't matter and in theory could be whatever
-OUTPUT_DIR_FOR_DOODAD_TARGET = '/tmp/doodad-output/'
+# GPU_DOODAD_DOCKER_IMAGE = "anair17/railrl-gpu-v3"
+GPU_DOODAD_DOCKER_IMAGE = 'anair17/railrl-gpu-v7a' #  # 'vitchyr/railrl-vitchyr-gpu-v3'
+GPU_INSTANCE_TYPE = 't2.micro'#'g3.4xlarge'
+GPU_SPOT_PRICE = 1.0
+GPU_AWS_IMAGE_ID = "ami-0d0e41d4881742fa3"
 
-
-"""
-Slurm Settings
-"""
-SINGULARITY_IMAGE = '/home/PATH/TO/IMAGE.img'
-# This assumes you saved mujoco to $HOME/.mujoco
+GPU_SINGULARITY_IMAGE = "/home/ashvin/gpuv6cuda9.img"
+SINGULARITY_IMAGE = "/home/ashvin/gpuv6cuda9.img"
 SINGULARITY_PRE_CMDS = [
     'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$HOME/.mujoco/mjpro150/bin'
 ]
-SLURM_CPU_CONFIG = dict(
-    account_name='TODO',
-    partition='savio',
-    nodes=1,
-    n_tasks=1,
-    n_gpus=1,
-)
-SLURM_GPU_CONFIG = dict(
-    account_name='TODO',
-    partition='savio2_1080ti',
-    nodes=1,
-    n_tasks=1,
-    n_gpus=1,
-)
 
-
-"""
-Slurm Script Settings
-
-These are basically the same settings as above, but for the remote machine
-where you will be running the generated script.
-"""
-SSS_CODE_DIRS_TO_MOUNT = [
-]
-SSS_DIR_AND_MOUNT_POINT_MAPPINGS = [
-    dict(
-        local_dir='/global/home/users/USERNAME/.mujoco',
-        mount_point='/root/.mujoco',
+SSH_HOSTS=dict(
+    localhost=dict(
+        username="ashvin",
+        hostname="localhost",
     ),
-]
-SSS_LOG_DIR = '/global/scratch/USERNAME/doodad-log'
-
-SSS_IMAGE = '/global/scratch/USERNAME/TODO.img'
-SSS_RUN_DOODAD_EXPERIMENT_SCRIPT_PATH = (
-    '/global/home/users/USERNAME/path/to/rlkit/scripts'
-    '/run_experiment_from_doodad.py'
+    surgical1=dict(
+        username="ashvin",
+        hostname="surgical1",
+    ),
+    newton1=dict(
+        username="ashvin",
+        hostname="newton1",
+    ),
+    newton2=dict(
+        username="ashvin",
+        hostname="newton2",
+    ),
+    newton3=dict(
+        username="ashvin",
+        hostname="newton3",
+    ),
+    newton4=dict(
+        username="ashvin",
+        hostname="newton4",
+    ),
+    newton5=dict(
+        username="ashvin",
+        hostname="newton5",
+    ),
+    newton6=dict(
+        username="ashvin",
+        hostname="newton6",
+    ),
+    newton7=dict(
+        username="ashvin",
+        hostname="newton7",
+    ),
 )
-SSS_PRE_CMDS = [
-    'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/global/home/users/USERNAME'
-    '/.mujoco/mjpro150/bin'
-]
+SSH_DEFAULT_HOST="fail"
 
-"""
-GCP Settings
-"""
-GCP_IMAGE_NAME = 'TODO'
-GCP_GPU_IMAGE_NAME = 'TODO'
-GCP_BUCKET_NAME = 'TODO'
+SSH_LOG_DIR = '/media/4tb/ashvin/data/s3doodad'
+SSH_PRIVATE_KEY = '/home/ashvin/.ssh/id_rsa'
 
-GCP_DEFAULT_KWARGS = dict(
-    zone='us-west2-c',
-    instance_type='n1-standard-4',
-    image_project='TODO',
-    terminate=True,
-    preemptible=True,
-    gpu_kwargs=dict(
-        gpu_model='nvidia-tesla-p4',
-        num_gpu=1,
-    )
-)
+REGION_TO_GPU_AWS_IMAGE_ID = {
+    #'us-west-1': "ami-0b2985bdb79796529",
+    #'us-east-1': "ami-0680f279",
+    #'us-west-2': "ami-0e57f21d309963e66",
+    'us-east-2': "ami-0d0e41d4881742fa3",
+}
+AWS_CPU_IMAGE_ID = "ami-0d0e41d4881742fa3"
+REGION_TO_GPU_AWS_AVAIL_ZONE = {}
 
-try:
-    from rlkit.launchers.conf_private import *
-except ImportError:
-    print("No personal conf_private.py found.")
+# This really shouldn't matter and in theory could be whatever
+OUTPUT_DIR_FOR_DOODAD_TARGET = '/tmp/doodad-output/'

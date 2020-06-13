@@ -20,21 +20,38 @@ from rlkit.torch.her.her import HERTrainer
 from rlkit.torch.networks import FlattenMlp
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
-try:
-    import multiworld.envs.gridworlds
-except ImportError as e:
-    print("To run this example, you need to install `multiworld`. See "
-          "https://github.com/vitchyr/multiworld.")
-    raise e
+import multiworld
+
+def get_env(render=False):
+    from multiworld.core.image_raw_env import ImageRawEnv
+    from multiworld.envs.pybullet.cameras import jaco2_push_top_view_camera
+    wrapped_env = gym.make("Jaco2PushPrimitiveDiscOneXYEnv-v0" ,isRender= render,
+    isImageObservation= False,
+       vis_debug=True)
+
+    env = ImageRawEnv(
+            wrapped_env,
+            init_camera=jaco2_push_top_view_camera,
+            heatmap=True,
+            normalize=False,
+            reward_type='wrapped_env',
+            goal_in_image_dict_key = 'valid_depth_heightmap',
+        )
+    return env
 
 
 def experiment(variant):
-    expl_env = gym.make('GoalGridworld-v0')
-    eval_env = gym.make('GoalGridworld-v0')
+    multiworld.register_all_envs()
+
+    expl_env = get_env(render=False)
+    eval_env = get_env(render=False)
 
     obs_dim = expl_env.observation_space.spaces['observation'].low.size
     goal_dim = expl_env.observation_space.spaces['desired_goal'].low.size
+
     action_dim = expl_env.action_space.n
+
+
     qf = FlattenMlp(
         input_size=obs_dim + goal_dim,
         output_size=action_dim,

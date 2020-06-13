@@ -91,6 +91,9 @@ class Logger(object):
         self._log_tabular_only = False
         self._header_printed = False
         self.table_printer = TerminalTablePrinter()
+        self.sync_s3 = False
+        self.bucket_path = None
+
 
     def reset(self):
         self.__init__()
@@ -133,6 +136,13 @@ class Logger(object):
 
     def set_snapshot_dir(self, dir_name):
         self._snapshot_dir = dir_name
+
+    def set_aws_mode(self, bucket_path):
+        if bucket_path is not None:
+            self.bucket_path = bucket_path
+
+            self.sync_s3 = True
+
 
     def get_snapshot_dir(self, ):
         return self._snapshot_dir
@@ -300,6 +310,20 @@ class Logger(object):
                 pass
             else:
                 raise NotImplementedError
+
+    def upload_aws(self):
+        if self.sync_s3 and self.bucket_path is not None:
+
+            local_floder_name = self._snapshot_dir.split('/')[-1]
+
+
+            bucket_outdir = '{}/{}'.format(self.bucket_path, local_floder_name)
+
+            #cmd = "aws s3 cp {} s3://{} --recursive".format(os.path.abspath(self._snapshot_dir), bucket_outdir)
+            cmd = "aws s3 sync {} s3://{} ".format(os.path.abspath(self._snapshot_dir), bucket_outdir)
+            logger.log('sync the local log with s3 ...')
+            logger.log(cmd)
+            os.system(cmd)
 
 
 logger = Logger()

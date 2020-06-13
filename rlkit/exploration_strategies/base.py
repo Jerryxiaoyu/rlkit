@@ -44,3 +44,43 @@ class PolicyWrappedWithExplorationStrategy(ExplorationPolicy):
     def reset(self):
         self.es.reset()
         self.policy.reset()
+
+import random
+import numpy as np
+
+class PushPrimitiveWithExplorationStrategy(ExplorationStrategy):
+    """
+    Take a random discrete action with some probability.
+    """
+    def __init__(
+            self,
+            policy,
+            primitive_policy,
+            prob_random_action= 0.1,
+    ):
+
+        self.policy = policy
+        self.t = 0
+        self.prob_random_action = prob_random_action
+        self.primitive_policy = primitive_policy
+        self.decay_rate = True
+
+    def get_action(self,  *args, **kwargs):
+        if random.random() <= self.prob_random_action:
+            action, agent_info = self.primitive_policy.get_action(*args, **kwargs)
+        else:
+
+            action, agent_info = self.policy.get_action(*args, **kwargs)
+        return action, agent_info
+
+    def reset(self):
+
+        self.primitive_policy.reset()
+        self.policy.reset()
+
+    def update_explor_rate(self, epoch):
+
+        self.prob_random_action = max(0.5 * np.power(0.96, epoch),0.1) if self.decay_rate else self.prob_random_action
+
+        print('exploration rate :', self.prob_random_action)
+

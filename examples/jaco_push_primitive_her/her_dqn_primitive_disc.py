@@ -20,20 +20,19 @@ from rlkit.torch.her.her import HERTrainer
 from rlkit.torch.networks import FlattenMlp
 from rlkit.torch.torch_rl_algorithm import TorchBatchRLAlgorithm
 
-try:
-    import multiworld.envs.gridworlds
-except ImportError as e:
-    print("To run this example, you need to install `multiworld`. See "
-          "https://github.com/vitchyr/multiworld.")
-    raise e
+import multiworld
+multiworld.register_pybullet_envs()
 
 
 def experiment(variant):
-    expl_env = gym.make('GoalGridworld-v0')
-    eval_env = gym.make('GoalGridworld-v0')
+    expl_env = gym.make('Jaco2PushPrimitiveDiscOneXYEnv-v0')
+    eval_env = gym.make('Jaco2PushPrimitiveDiscOneXYEnv-v0')
 
-    obs_dim = expl_env.observation_space.spaces['observation'].low.size
-    goal_dim = expl_env.observation_space.spaces['desired_goal'].low.size
+    observation_key = 'state_observation'
+    desired_goal_key = 'state_desired_goal'
+
+    obs_dim = expl_env.observation_space.spaces['state_observation'].low.size
+    goal_dim = expl_env.observation_space.spaces['state_desired_goal'].low.size
     action_dim = expl_env.action_space.n
     qf = FlattenMlp(
         input_size=obs_dim + goal_dim,
@@ -56,10 +55,11 @@ def experiment(variant):
 
     replay_buffer = ObsDictRelabelingBuffer(
         env=eval_env,
+        observation_key=observation_key,
+        desired_goal_key=desired_goal_key,
         **variant['replay_buffer_kwargs']
     )
-    observation_key = 'observation'
-    desired_goal_key = 'desired_goal'
+
     eval_path_collector = GoalConditionedPathCollector(
         eval_env,
         eval_policy,
@@ -95,21 +95,21 @@ if __name__ == "__main__":
     variant = dict(
         algo_kwargs=dict(
             num_epochs=100,
-            max_path_length=5 ,
-            num_eval_steps_per_epoch=10 ,
-            num_expl_steps_per_train_loop=10 ,
-            num_trains_per_train_loop=10 ,
-            min_num_steps_before_training=10 ,
-            batch_size=4,
+            max_path_length=50 ,  #50
+            num_eval_steps_per_epoch=1000, #1000
+            num_expl_steps_per_train_loop=1000, #1000
+            num_trains_per_train_loop=1000, #1000
+            min_num_steps_before_training=1000, #1000
+            batch_size=128, #128
         ),
         trainer_kwargs=dict(
             discount=0.99,
         ),
         replay_buffer_kwargs=dict(
-            max_size=100000,
+            max_size=10000, #100000
             fraction_goals_rollout_goals=0.2,  # equal to k = 4 in HER paper
             fraction_goals_env_goals=0.0,
         ),
     )
-    setup_logger('her-dqn-gridworld-experiment', variant=variant)
+    setup_logger('her-dqn-jaco_push_primi_disc-experiment', variant=variant)
     experiment(variant)

@@ -44,18 +44,24 @@ def _elem_or_tuple_to_variable(elem_or_tuple):
     return ptu.from_numpy(elem_or_tuple).float()
 
 
-def _filter_batch(np_batch):
+def _filter_batch(np_batch  ):
     for k, v in np_batch.items():
-        if v.dtype == np.bool:
-            yield k, v.astype(int)
-        else:
-            yield k, v
 
 
-def np_to_pytorch_batch(np_batch):
-    return {
-        k: _elem_or_tuple_to_variable(x)
-        for k, x in _filter_batch(np_batch)
-        if x.dtype != np.dtype('O')  # ignore object (e.g. dictionaries)
-    }
+            if v.dtype == np.bool:
+                yield k, v.astype(int)
+            else:
+                yield k, v
 
+
+def np_to_pytorch_batch(np_batch, ignore_keys= []):
+    # return {
+    #     k: _elem_or_tuple_to_variable(x)
+    #     for k, x in _filter_batch(np_batch , ignore_keys)
+    #     if x.dtype != np.dtype('O')   # ignore object (e.g. dictionaries)
+    # }
+    res ={}
+    for k, x in _filter_batch(np_batch ):
+        if x.dtype != np.dtype('O'):
+            res[k] = x if ignore_keys is not None and k in ignore_keys else _elem_or_tuple_to_variable(x)
+    return res

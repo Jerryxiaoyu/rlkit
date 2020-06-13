@@ -47,9 +47,9 @@ if __name__ == "__main__":
                 batch_size=1024,
                 num_epochs=750,
                 num_eval_steps_per_epoch=500,
-                num_expl_steps_per_train_loop=500,
+                num_expl_steps_per_train_loop=500,  ##
                 num_trains_per_train_loop=1000,
-                min_num_steps_before_training=10000,
+                min_num_steps_before_training=10, #10000
                 vae_training_schedule=vae_schedules.custom_schedule,
                 oracle_data=False,
                 vae_save_period=50,
