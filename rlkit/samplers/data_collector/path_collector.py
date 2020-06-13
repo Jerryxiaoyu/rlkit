@@ -3,6 +3,10 @@ from collections import deque, OrderedDict
 from rlkit.core.eval_util import create_stats_ordered_dict
 from rlkit.samplers.rollout_functions import rollout, multitask_rollout, multitask_dict_rollout
 from rlkit.samplers.data_collector.base import PathCollector
+import mpi4py.MPI as MPI
+import numpy as np
+
+
 
 
 class MdpPathCollector(PathCollector):
@@ -201,6 +205,12 @@ class GoalConditionedDictPathCollector(PathCollector):
         self._num_steps_total = 0
         self._num_paths_total = 0
 
+        # MPI stuff
+        if MPI:
+            self.rank_id = MPI.COMM_WORLD.Get_rank()
+        else:
+            self.rank_id = 0
+
     def collect_mp_new_paths(self):
 
         pool = mp.Pool()
@@ -216,8 +226,6 @@ class GoalConditionedDictPathCollector(PathCollector):
             max_path_length,
             num_steps,
             discard_incomplete_paths,
-
-
     ):
         paths = []
         num_steps_collected = 0

@@ -83,21 +83,14 @@ def experiment(variant):
     from rlkit.core import logger
 
     logger.set_aws_mode(variant['bucket_path'])
-    def get_env(render=False):
+    def get_env(render=False, **env_kwargs):
         from multiworld.core.image_raw_env import ImageRawEnv
 
         wrapped_env = gym.make("Jaco2PushPrimitiveDiscOneXYEnv-v0", isRender=render,
                                isImageObservation=False,
 
-                               reward_mode=0,  ## 0 for dense, 1 for sparse
-                               maxActionSteps=10,
-                               obj_name_list=['b_L1'],
-                               isRandomGoals=False,
-                               isIgnoreGoalCollision=False,
-                               fixed_objects_goals=(-0, -0.3,
-                                                    ),  # shape (3*n,)
-
-                               vis_debug=False)
+                               **env_kwargs,
+                               )
 
         env = ImageRawEnv(
             wrapped_env,
@@ -111,8 +104,8 @@ def experiment(variant):
         )
         return env
 
-    expl_env = get_env(render=False)
-    eval_env = get_env(render=False)
+    expl_env = get_env(render=False, **variant['env_kwargs'])
+    eval_env = get_env(render=False, **variant['env_kwargs'])
     #obs_dim = expl_env.observation_space.low.size
 
     action_space = (16,50,50)
@@ -192,7 +185,17 @@ if __name__ == "__main__":
     desired_goal_key = 'heatmap'
 
     variant = dict(
+        env_kwargs=dict(
+            reward_mode=1,  ## 0 for dense, 1 for sparse
+            maxActionSteps=10,
+            obj_name_list=['b_L1'],
+            isRandomGoals=False,
+            isIgnoreGoalCollision=False,
+            fixed_objects_goals=(-0, -0.3,
+                                 ),  # shape (3*n,)
 
+            vis_debug=False
+        ),
         observation_key = observation_key,
         desired_goal_key = desired_goal_key,
         algorithm="SAC",
