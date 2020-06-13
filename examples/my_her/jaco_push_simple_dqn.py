@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     variant = dict(
         env_kwargs=dict(
-            reward_mode=1,  ## 0 for dense, 1 for sparse
+            reward_mode=0,  ## 0 for dense, 1 for sparse
             maxActionSteps=10,
             obj_name_list=['b_L1'],
             isRandomGoals=False,
@@ -229,7 +229,7 @@ if __name__ == "__main__":
         trainer_kwargs=dict(
             discount=0.99,
             learning_rate=3E-4,
-            target_update_period=2,
+            target_update_period=1000,
             soft_target_tau=1,
         ),
         bucket_path = 'jerry-castle/castle_q_learning/results'  #None
