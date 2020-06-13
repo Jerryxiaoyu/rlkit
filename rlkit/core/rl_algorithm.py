@@ -65,7 +65,7 @@ class BaseRLAlgorithm(object, metaclass=abc.ABCMeta):
         for post_epoch_func in self.post_epoch_funcs:
             post_epoch_func(self, epoch)
 
-        #logger.upload_aws()
+        logger.upload_aws()
 
     def _get_snapshot(self):
         snapshot = {}

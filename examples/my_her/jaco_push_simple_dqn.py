@@ -6,7 +6,6 @@ project_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(in
 print(project_dir)
 os.sys.path.insert(0, project_dir)
 
-
 from rlkit.exploration_strategies.base import \
     PolicyWrappedWithExplorationStrategy, PushPrimitiveWithExplorationStrategy
 from rlkit.exploration_strategies.epsilon_greedy import EpsilonGreedy, PushNetEpsilonGreedy, PushNetPrimitiveEpsilonGreedy
@@ -210,7 +209,7 @@ if __name__ == "__main__":
             goal_keys=None,
         ),
         algorithm_kwargs=dict(
-            num_epochs=50 ,
+            num_epochs=2 ,
             num_eval_steps_per_epoch=10 , # 50
             num_train_loops_per_epoch = 1, #50
             num_trains_per_train_loop=1,#1000
