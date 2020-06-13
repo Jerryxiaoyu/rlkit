@@ -56,14 +56,18 @@ class PushPrimitiveWithExplorationStrategy(ExplorationStrategy):
             self,
             policy,
             primitive_policy,
-            prob_random_action= 0.1,
+            init_prob = 0.5,
+            decay_rate = 1, # deflaut no decay
+
+
     ):
 
         self.policy = policy
         self.t = 0
-        self.prob_random_action = prob_random_action
+        self.prob_random_action = init_prob
         self.primitive_policy = primitive_policy
-        self.decay_rate = True
+        self.init_prob = init_prob
+        self.decay_rate = decay_rate
 
     def get_action(self,  *args, **kwargs):
         if random.random() <= self.prob_random_action:
@@ -80,7 +84,7 @@ class PushPrimitiveWithExplorationStrategy(ExplorationStrategy):
 
     def update_explor_rate(self, epoch):
 
-        self.prob_random_action = max(0.5 * np.power(0.96, epoch),0.1) if self.decay_rate else self.prob_random_action
+        self.prob_random_action = max(self.init_prob * np.power(self.decay_rate, epoch),0.1) #if self.decay_rate!=1 else self.prob_random_action
 
         print('exploration rate :', self.prob_random_action)
 

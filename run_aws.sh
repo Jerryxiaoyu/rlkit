@@ -7,7 +7,7 @@ MULTIWORLD_PATH=/home/ubuntu/jerry/multiworld
 source activate pytorch_p36
 
 cd /home/ubuntu
-sh install 410.104
+sh install.sh 410.104
 nvidia-smi
 
 

@@ -18,7 +18,7 @@ class PushDQNTrainer(TorchTrainer):
             qf,
             target_qf,
             learning_rate=1e-3,
-            soft_target_tau=1e-3,
+            soft_target_tau=1 ,  # 1
             target_update_period=1,
             qf_criterion=None,
 
@@ -41,6 +41,10 @@ class PushDQNTrainer(TorchTrainer):
         self.eval_statistics = OrderedDict()
         self._n_train_steps_total = 0
         self._need_to_update_eval_statistics = True
+
+        # ptu.soft_update_from_to(
+        #     self.qf, self.target_qf, self.soft_target_tau
+        # )
 
         self.ignore_keys = ignore_keys
 
@@ -129,9 +133,57 @@ class PushDQNTrainer(TorchTrainer):
         Soft Updates
         """
         if self._n_train_steps_total % self.target_update_period == 0:
+            #
+            # import matplotlib.pyplot as plt
+            #
+            # self.qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
+            # pf_pred = self.qf.model.output_prob[0][0].view(1, lable_size, lable_size)
+            # loss = self.qf_criterion(pf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
+            # qf_loss = loss.sum()
+            #
+            #
+            # self.target_qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
+            # target_qf_pred = self.target_qf.model.output_prob[0][0].view(1, lable_size, lable_size)
+            # loss = self.qf_criterion(target_qf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
+            # target_qf_loss = loss.sum()
+            #
+            # plt.figure()
+            # plt.imshow(pf_pred.data.cpu().numpy()[0])
+            # plt.title('qf:{}'.format(ptu.get_numpy(qf_loss)))
+            # plt.savefig('qf.png')
+            #
+            # plt.figure()
+            # plt.imshow(target_qf_pred.data.cpu().numpy()[0])
+            # plt.title('target_qf_pred:{}'.format(ptu.get_numpy(target_qf_loss)))
+            # plt.savefig('target_qf_pred.png')
+
             ptu.soft_update_from_to(
-                self.qf, self.target_qf, self.soft_target_tau
+                self.qf, self.target_qf,   self.soft_target_tau
             )
+            #
+            #
+            #
+            # self.qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
+            # pf_pred = self.qf.model.output_prob[0][0].view(1, lable_size, lable_size)
+            # loss = self.qf_criterion(pf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
+            # qf_loss = loss.sum()
+            #
+            # self.target_qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
+            # target_qf_pred = self.target_qf.model.output_prob[0][0].view(1, lable_size, lable_size)
+            # loss = self.qf_criterion(target_qf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
+            # target_qf_loss = loss.sum()
+            #
+            # plt.figure()
+            # plt.imshow(pf_pred.data.cpu().numpy()[0])
+            # plt.title('updated_qf:{}'.format(ptu.get_numpy(qf_loss)))
+            # plt.savefig('updated_qf.png')
+            #
+            # plt.figure()
+            # plt.imshow(target_qf_pred.data.cpu().numpy()[0])
+            # plt.title('updated_target_qf_pred:{}'.format(ptu.get_numpy(target_qf_loss)))
+            # plt.savefig('updated_target_qf_pred.png')
+            #
+            # print('--------------------------------------------')
 
         print('loss value:', np.mean(ptu.get_numpy(qf_loss)))
         """
