@@ -209,17 +209,17 @@ if __name__ == "__main__":
             goal_keys=None,
         ),
         algorithm_kwargs=dict(
-            num_epochs=2 ,
-            num_eval_steps_per_epoch=10 , # 50
+            num_epochs=100,
+            num_eval_steps_per_epoch=100 , # 50
             num_train_loops_per_epoch = 1, #50
-            num_trains_per_train_loop=1,#1000
-            num_expl_steps_per_train_loop=10,#500
+            num_trains_per_train_loop=1000,#1000
+            num_expl_steps_per_train_loop=500,#500
             min_num_steps_before_training=0,
             max_path_length=10,
-            batch_size=1,
+            batch_size=2,
         ),
         trainer_kwargs=dict(
-            discount=0.99,
+            discount=0.5,
             learning_rate=3E-4,
             target_update_period=1,
         ),
