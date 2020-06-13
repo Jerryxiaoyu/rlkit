@@ -13,7 +13,7 @@ nvidia-smi
 
 
 cd $PRO_DIR
-git clone -b my_master https://github.com/Jerryxiaoyu/rlkit.git
+#git clone -b my_master https://github.com/Jerryxiaoyu/rlkit.git
 git clone -b my_branch https://github.com/Jerryxiaoyu/multiworld.git
 
 cd $MULTIWORLD_PATH
