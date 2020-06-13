@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     variant = dict(
         env_kwargs=dict(
-            reward_mode=1,  ## 0 for dense, 1 for sparse
+            reward_mode=0,  ## 0 for dense, 1 for sparse
             maxActionSteps=10,
             obj_name_list=['b_L1'],
             isRandomGoals=False,
