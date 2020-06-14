@@ -217,7 +217,7 @@ if __name__ == "__main__":
             goal_keys=None,
         ),
         algorithm_kwargs=dict(
-            num_epochs= 2,
+            num_epochs= 1000,
             num_eval_steps_per_epoch= 100 , # 100
             num_train_loops_per_epoch = 1, #1
             num_trains_per_train_loop= 1000,#1000
