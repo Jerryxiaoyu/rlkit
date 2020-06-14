@@ -217,19 +217,19 @@ if __name__ == "__main__":
             goal_keys=None,
         ),
         algorithm_kwargs=dict(
-            num_epochs= 2 ,
-            num_eval_steps_per_epoch= 0 , # 100
+            num_epochs= 100 ,
+            num_eval_steps_per_epoch= 10 , # 100
             num_train_loops_per_epoch = 1, #1
-            num_trains_per_train_loop= 1,#1000
-            num_expl_steps_per_train_loop= 1,#500
+            num_trains_per_train_loop= 200,#1000
+            num_expl_steps_per_train_loop= 5,#500
             min_num_steps_before_training= 0,
             max_path_length= 10,
-            batch_size= 2,#2
+            batch_size= 6,#2
         ),
         trainer_kwargs=dict(
             discount=0.5,
             learning_rate=3E-4,
-            target_update_period=1000,
+            target_update_period=200,
             soft_target_tau=1,
 
             reward_mode=1,  # for sparse
