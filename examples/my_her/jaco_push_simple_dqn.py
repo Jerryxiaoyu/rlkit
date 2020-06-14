@@ -197,7 +197,7 @@ if __name__ == "__main__":
             vis_debug=False
         ),
         primitive_kwargs = dict(
-            init_prob=0.5,
+            init_prob=1,
             decay_rate=0.97,
         ),
 
