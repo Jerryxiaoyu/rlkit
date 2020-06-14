@@ -227,7 +227,7 @@ if __name__ == "__main__":
             batch_size= 2,#2
         ),
         trainer_kwargs=dict(
-            discount=0.99,
+            discount=0.5,
             learning_rate=3E-4,
             target_update_period=1000,
             soft_target_tau=1,
