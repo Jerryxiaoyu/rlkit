@@ -218,10 +218,10 @@ if __name__ == "__main__":
         ),
         algorithm_kwargs=dict(
             num_epochs= 100 ,
-            num_eval_steps_per_epoch= 100 , # 100
+            num_eval_steps_per_epoch= 1  , # 100
             num_train_loops_per_epoch = 1, #1
-            num_trains_per_train_loop= 200,#1000
-            num_expl_steps_per_train_loop= 500,#500
+            num_trains_per_train_loop= 2 ,#1000  200
+            num_expl_steps_per_train_loop= 1,#500
             min_num_steps_before_training= 0,
             max_path_length= 10,
             batch_size= 6,#2
