@@ -118,6 +118,7 @@ class pushModel(nn.Module):
                     flow_grid_after = self.batch_flow_grid_after_list[rotate_idx]
                 else:
                     raise NotImplementedError
+                    #flow_grid_before, flow_grid_after= self.get_flow_grid( n_batch)
 
                 # Rotate images clockwise
                 if self.use_cuda:

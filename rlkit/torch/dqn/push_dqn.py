@@ -68,20 +68,30 @@ class PushDQNTrainer(TorchTrainer):
         """
         if self.reward_mode ==1: # for sparse
             change_detected = ptu.get_numpy(rewards) > 0
-            index_changed = np.where(change_detected == True)[0]
+            index_unchanged = np.where(change_detected == False)[0]
 
-            future_reward = np.zeros((n_batch, 1))
 
-            if index_changed.size != 0:
-                next_color_heightmap = next_obs[index_changed, :, :, :3]
-                next_depth_heightmap = next_obs[index_changed, :, :, -1]
-                next_push_predictions, next_grasp_predictions, next_state_feat = self.target_qf(next_color_heightmap,
-                                                                                                next_depth_heightmap,
-                                                                                                is_volatile=True)
-                future_reward_changes = np.max(next_push_predictions, axis=(1, 2, 3)).reshape((n_batch, -1))
 
-                for i, idx in enumerate(index_changed):
-                    future_reward[idx] = future_reward_changes[i]
+            next_color_heightmap = next_obs[:, :, :, :3]
+            next_depth_heightmap = next_obs[:, :, :, -1]
+            next_push_predictions, next_grasp_predictions, next_state_feat = self.target_qf(next_color_heightmap,
+                                                                                            next_depth_heightmap,
+                                                                                            is_volatile=True)
+            future_reward  = np.max(next_push_predictions, axis=(1, 2, 3)).reshape((n_batch, -1))
+
+            for i, idx in enumerate(index_unchanged):
+                future_reward[idx] = 0
+
+            # if index_changed.size != 0:
+            #     next_color_heightmap = next_obs[index_changed, :, :, :3]
+            #     next_depth_heightmap = next_obs[index_changed, :, :, -1]
+            #     next_push_predictions, next_grasp_predictions, next_state_feat = self.target_qf(next_color_heightmap,
+            #                                                                                     next_depth_heightmap,
+            #                                                                                     is_volatile=True)
+            #     future_reward_changes = np.max(next_push_predictions, axis=(1, 2, 3)).reshape((n_batch, -1))
+            #
+            #     for i, idx in enumerate(index_changed):
+            #         future_reward[idx] = future_reward_changes[i]
 
         else:
 
