@@ -9,20 +9,17 @@ import gym
 import multiworld
 
 
-def get_env(render=False):
+def get_env(render=False,  **env_kwargs):
     from multiworld.core.image_raw_env import ImageRawEnv
     from multiworld.envs.pybullet.cameras import jaco2_push_top_view_camera
     wrapped_env = gym.make("Jaco2PushPrimitiveDiscOneXYEnv-v0" ,isRender = render,
     isImageObservation= False,
 
-   maxActionSteps=10,
+   opengl_Render_enable=False,
+   vis_debug=True,
+   **env_kwargs,
 
-   isRandomGoals=False,
-   isIgnoreGoalCollision=False,
-   fixed_objects_goals=(-0, -0.3,
-                         ),  # shape (3*n,)
-
-   vis_debug=True)
+   )
 
     env = ImageRawEnv(
             wrapped_env,
@@ -37,11 +34,18 @@ def get_env(render=False):
     return env
 
 def simulate_policy(args):
+    import os
+    import json
+
+    file_path = os.path.join(args.path, 'params.pkl')
+
+    with open(args.path + "/variant.json", 'r') as load_f:
+        variant =json.load(load_f)
 
 
-    data = torch.load(args.file)
+    data = torch.load(file_path)
     policy = data['evaluation/policy']
-    env = get_env(True)
+    env = get_env(True, **variant['env_kwargs'])
 
 #    env = gym.make(env.spec.id, isRender=True, isRenderGoal= True,)
 
@@ -75,9 +79,9 @@ def simulate_policy(args):
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', type=str,
+    parser.add_argument('--path', type=str,
                         help='path to the snapshot file',
-                        default='/home/drl/PycharmProjects/JerryRepos/rlkit/data/06-09-jaco-push-dqn/06-09-jaco_push_dqn_2020_06_09_14_22_36_0000--s-46168/params.pkl')
+                        default='/home/drl/PycharmProjects/JerryRepos/rlkit/log-files/aws/results/06-13-jaco_push_dqn_2020_06_13_09_35_17_0000--s-97961')
     parser.add_argument('--H', type=int, default=30,
                         help='Max length of rollout')
     parser.add_argument('--speedup', type=float, default=10,

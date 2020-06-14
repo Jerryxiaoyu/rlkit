@@ -134,28 +134,30 @@ class PushDQNTrainer(TorchTrainer):
         """
         if self._n_train_steps_total % self.target_update_period == 0:
             #
-            # import matplotlib.pyplot as plt
-            #
-            # self.qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
-            # pf_pred = self.qf.model.output_prob[0][0].view(1, lable_size, lable_size)
-            # loss = self.qf_criterion(pf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
-            # qf_loss = loss.sum()
-            #
-            #
-            # self.target_qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
-            # target_qf_pred = self.target_qf.model.output_prob[0][0].view(1, lable_size, lable_size)
-            # loss = self.qf_criterion(target_qf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
-            # target_qf_loss = loss.sum()
-            #
-            # plt.figure()
-            # plt.imshow(pf_pred.data.cpu().numpy()[0])
-            # plt.title('qf:{}'.format(ptu.get_numpy(qf_loss)))
-            # plt.savefig('qf.png')
-            #
-            # plt.figure()
-            # plt.imshow(target_qf_pred.data.cpu().numpy()[0])
-            # plt.title('target_qf_pred:{}'.format(ptu.get_numpy(target_qf_loss)))
-            # plt.savefig('target_qf_pred.png')
+            import matplotlib.pyplot as plt
+
+            self.qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
+            pf_pred = self.qf.model.output_prob[0][0].view(1, lable_size, lable_size)
+            loss = self.qf_criterion(pf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
+            qf_loss = loss.sum()
+
+
+            self.target_qf(color_heightmap, depth_heightmap, is_volatile=False, specific_rotation=specified_angle_index)
+            target_qf_pred = self.target_qf.model.output_prob[0][0].view(1, lable_size, lable_size)
+            loss = self.qf_criterion(target_qf_pred, Variable(label.cuda() * label_weights.cuda(), requires_grad=False))
+            target_qf_loss = loss.sum()
+
+            plt.figure()
+            plt.imshow(pf_pred.data.cpu().numpy()[0])
+            plt.title('qf:{}'.format(ptu.get_numpy(qf_loss)))
+
+            #plt.savefig('qf.png')
+
+            plt.figure()
+            plt.imshow(target_qf_pred.data.cpu().numpy()[0])
+            plt.title('target_qf_pred:{}'.format(ptu.get_numpy(target_qf_loss)))
+            #plt.savefig('target_qf_pred.png')
+
 
             ptu.soft_update_from_to(
                 self.qf, self.target_qf,   self.soft_target_tau

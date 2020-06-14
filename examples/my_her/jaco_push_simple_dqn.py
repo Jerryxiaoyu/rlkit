@@ -187,7 +187,7 @@ if __name__ == "__main__":
 
     variant = dict(
         env_kwargs=dict(
-            reward_mode=0,  ## 0 for dense, 1 for sparse
+            reward_mode=1,  ## 0 for dense, 1 for sparse
             maxActionSteps=10,
             obj_name_list=['b_L1'],
             isRandomGoals=False,
@@ -218,10 +218,10 @@ if __name__ == "__main__":
         ),
         algorithm_kwargs=dict(
             num_epochs= 1000,
-            num_eval_steps_per_epoch= 100 , # 100
+            num_eval_steps_per_epoch= 0 , # 100
             num_train_loops_per_epoch = 1, #1
-            num_trains_per_train_loop= 1000,#1000
-            num_expl_steps_per_train_loop= 500,#500
+            num_trains_per_train_loop= 1,#1000
+            num_expl_steps_per_train_loop= 1,#500
             min_num_steps_before_training= 0,
             max_path_length= 10,
             batch_size= 2,#2

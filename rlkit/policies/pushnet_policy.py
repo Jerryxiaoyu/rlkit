@@ -30,7 +30,7 @@ class PushNetArgmaxDiscretePolicy(nn.Module, Policy):
         best_action = np.unravel_index(np.argmax(push_predictions[0]), push_predictions[0].shape)
         #predicted_value = np.max(push_predictions)
 
-        #
+
         # img = get_prediction_vis(push_predictions[0], obs['color_heatmap'], best_action )
         #
         # cv2.imshow("Image", img)

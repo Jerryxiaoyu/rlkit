@@ -10,8 +10,6 @@ cd /home/ubuntu
 sh install.sh 410.104
 nvidia-smi
 
-
-
 cd $PRO_DIR
 #git clone -b my_master https://github.com/Jerryxiaoyu/rlkit.git
 git clone -b my_branch https://github.com/Jerryxiaoyu/multiworld.git

@@ -183,7 +183,7 @@ def multitask_dict_rollout(
         dict_obs.append(o)
 
         a, agent_info = agent.get_action(o, **get_action_kwargs)
-        #env.visualize(  a, o)
+#        env.visualize(  a, o)
         next_o, r, d, env_info = env.step(a)
 
         if render:
