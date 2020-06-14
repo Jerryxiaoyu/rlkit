@@ -231,6 +231,8 @@ if __name__ == "__main__":
             learning_rate=3E-4,
             target_update_period=1000,
             soft_target_tau=1,
+
+            reward_mode=1,  # for sparse
         ),
         bucket_path = 'jerry-castle/castle_q_learning/results'  #None
     )
